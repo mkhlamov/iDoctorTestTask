@@ -1,18 +1,55 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+namespace iDoctorTestTask
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Enemy : MonoBehaviour
     {
-        
-    }
+        [SerializeField] private float _speedRotation = 50f;
+        [SerializeField] private float _speedMove = 5f;
+        [SerializeField] private float _attackDistSquared = 0.6f;
+        [SerializeField] private AttackSO _attack;
+        private GameObject _player;
+        private ActorStats _actorStats;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private void Awake()
+        {
+            _player = FindObjectOfType<ShooterFromCamera>().gameObject;
+            _actorStats = GetComponent<ActorStats>();
+        }
+
+        private void Update()
+        {
+            LookAtPlayer();
+            MoveToPlayer();
+            AttackPlayer();
+        }
+
+        private void AttackPlayer()
+        {
+            Debug.Log($"{name} {Vector3.SqrMagnitude(transform.position - _player.transform.position)}");
+            if (Vector3.SqrMagnitude(transform.position - _player.transform.position) < _attackDistSquared)
+            {
+                var attack = _attack.CreateAttack(_actorStats);
+                var attackableComponents = _player.GetComponentsInChildren<IAttackable>();
+                foreach (var a in attackableComponents)
+                {
+                    a.OnAttack(gameObject, attack);
+                }
+            }
+        }
+
+        private void MoveToPlayer()
+        {
+            transform.position = Vector3.Slerp(transform.position, _player.transform.position,
+                Time.deltaTime * _speedMove);
+        }
+
+        private void LookAtPlayer()
+        {
+            var direction = _player.transform.position - transform.position;
+            var rotation = Quaternion.LookRotation(direction, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotation);
+        }
     }
 }

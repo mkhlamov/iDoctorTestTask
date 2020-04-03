@@ -12,10 +12,14 @@ public class Sight : MonoBehaviour
     private void Start()
     {
         _image = GetComponent<Image>();
+    }
+
+    private void OnEnable()
+    {
         GameManager.GameStateChanged += OnGameStateChanged;
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
         GameManager.GameStateChanged -= OnGameStateChanged;
     }

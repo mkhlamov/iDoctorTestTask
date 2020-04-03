@@ -10,12 +10,15 @@ namespace iDoctorTestTask
         public static event Action<GameState> GameStateChanged;
 
         private GameState _currentGameState;
+        private ShooterFromCamera _player;
 
         #region Monobehaviour Methods
 
         protected override void Start()
         {
             base.Start();
+            _player = FindObjectOfType<ShooterFromCamera>();
+            _player.GetComponent<KillableEvent>().KillableDead += OnPlayerDead;
             SpawnManager.AllEnemiesKilled += GameWon;
             SetGameState(GameState.Pregame);
         }
@@ -53,6 +56,11 @@ namespace iDoctorTestTask
         private void GameLost()
         {
             SetGameState(GameState.Lost);
+        }
+        
+        private void OnPlayerDead(KillableEvent obj)
+        {
+            GameLost();
         }
 
         #endregion
