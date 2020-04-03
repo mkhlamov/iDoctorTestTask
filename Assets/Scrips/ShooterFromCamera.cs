@@ -2,23 +2,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace iDoctorTestTask
 {
+    [RequireComponent(typeof(ActorStats))]
     public class ShooterFromCamera : MonoBehaviour
     {
-        [SerializeField] private Camera arCamera;
+        [SerializeField] private Camera _arCamera;
         
-        [SerializeField] private float rayDistanceFromCamera = 10.0f;
+        [SerializeField] private float _rayDistanceFromCamera = 10.0f;
 
-        [SerializeField] private float shootingRate = 0.2f;
-        private float shootingTimer = 0f;
+        [SerializeField] private float _shootingRate = 0.2f;
+        private float _shootingTimer = 0f;
         
-        [SerializeField] private GameObject sight;
+        [SerializeField] private GameObject _sight;
+        
+        [SerializeField] private AttackSO _attack;
+        private ActorStats _stats;
+
+        #region Monobehaviour
+        private void Awake()
+        {
+            _stats = GetComponent<ActorStats>();
+        }
 
         private void Update()
         {
-            if (shootingTimer >= shootingRate)
+            if (_shootingTimer >= _shootingRate)
             {
                 // Shoot on tap or click
 #if UNITY_EDITOR
@@ -27,24 +38,38 @@ namespace iDoctorTestTask
                 if (Input.touchCount > 0)
 #endif
                 {
-                    var ray = arCamera.ScreenPointToRay(sight.transform.position);
-                    RaycastHit hit;
-                    if (Physics.Raycast(ray, out hit, rayDistanceFromCamera))
-                    {
-                        var enemy = hit.transform;
-                        if (enemy.name == "Enemy")
-                        {
-                            Debug.Log($"Hit {enemy.name} {enemy.transform.position}");
-                        }
-                    }
-
-                    shootingTimer = 0f;
+                    Shoot();
+                    _shootingTimer = 0f;
                 }
             }
             else
             {
-                shootingTimer += Time.unscaledDeltaTime;
+                _shootingTimer += Time.unscaledDeltaTime;
             }
         }
+        #endregion
+
+        #region Private Methods
+
+        private void Shoot()
+        {
+            var ray = _arCamera.ScreenPointToRay(_sight.transform.position);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, _rayDistanceFromCamera))
+            {
+                var hitGO = hit.transform.gameObject;
+                if (hitGO.GetComponent<IAttackable>() != null)
+                {
+                    var attack = _attack.CreateAttack(_stats);
+                    var attackables = hitGO.GetComponentsInChildren<IAttackable>();
+                    foreach (var a in attackables)
+                    {
+                        a.OnAttack(gameObject, attack);
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }
