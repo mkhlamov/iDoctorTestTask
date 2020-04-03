@@ -6,7 +6,7 @@ namespace iDoctorTestTask
     {
         public void OnAttack(GameObject attacker, Attack attack)
         {
-            Debug.Log($"Attacked by {attacker.name} damage {attack.Damage}");
+            Debug.Log($"{name} attacked by {attacker.name} damage {attack.Damage}");
             if (attack.IsCritical)
             {
                 Debug.Log("Critical");
