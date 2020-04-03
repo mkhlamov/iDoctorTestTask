@@ -18,10 +18,17 @@ public class ScoreManager : Singleton<ScoreManager>
         base.Awake();
         _scoreText = GetComponent<Text>();
         UpdateScoreText();
-        GameManager.GameStarted += OnGameStarted;
+        GameManager.GameStateChanged += OnGameStateChanged;
         SpawnManager.EnemySpawned += OnEnemySpawned;
     }
-    
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        GameManager.GameStateChanged -= OnGameStateChanged;
+        SpawnManager.EnemySpawned -= OnEnemySpawned;
+    }
+
     #endregion
 
     #region Public Methods
@@ -40,10 +47,26 @@ public class ScoreManager : Singleton<ScoreManager>
         _score += 1;
         UpdateScoreText();
     }
-    private void OnGameStarted()
+    private void OnGameStateChanged(GameState gameState)
     {
-        _score = 0;
-        UpdateScoreText();
+        switch (gameState)
+        {
+            case GameState.Running:
+                _score = 0;
+                UpdateScoreText();
+                break;
+            case GameState.Pregame:
+                _score = 0;
+                ClearScoreText();
+                break;
+            case GameState.Won:
+                break;
+            case GameState.Lost:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(gameState), gameState, null);
+        }
+        
     }
 
     private void OnEnemySpawned(GameObject e)
@@ -61,6 +84,11 @@ public class ScoreManager : Singleton<ScoreManager>
     private void UpdateScoreText()
     {
         _scoreText.text = _score.ToString();
+    }
+    
+    private void ClearScoreText()
+    {
+        _scoreText.text = "";
     }
 
     #endregion

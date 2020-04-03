@@ -10,11 +10,13 @@ namespace iDoctorTestTask
     public class SpawnManager : Singleton<SpawnManager>
     {
         public static event Action AllEnemiesSpawned;
+        public static event Action AllEnemiesKilled;
         public static event Action<GameObject> EnemySpawned;
         
         [SerializeField] private int _maxEnemies = 10;
         [SerializeField] private float _spawnRate = 0.7f;
         [SerializeField] private List<GameObject> _enemyPrefabs;
+        [SerializeField] private Transform _spawnParent;
         private float _timeSinceLastSpawn = 0f;
         [SerializeField] private List<GameObject> _enemiesSpawned = new List<GameObject>();
         private int _enemiesSpawnedTotalCount = 0;
@@ -26,7 +28,7 @@ namespace iDoctorTestTask
         {
             base.Awake();
             _needToSpawn = false;
-            GameManager.GameStarted += OnGameStarted;
+            GameManager.GameStateChanged += OnGameStateChanged;
         }
 
         private void Update()
@@ -36,18 +38,7 @@ namespace iDoctorTestTask
 
             if (_timeSinceLastSpawn >= _spawnRate)
             {
-                var spawnPlace = GetSpawnCoords();
-                Debug.Log($"{spawnPlace}");
-                var enemySpawned = Instantiate(_enemyPrefabs[Random.Range(0, _enemyPrefabs.Count)], spawnPlace,
-                    Quaternion.identity);
-                enemySpawned.transform.parent = gameObject.transform;
-                _enemiesSpawned.Add(enemySpawned);
-                EnemySpawned?.Invoke(enemySpawned);
-                var killableEvent = enemySpawned.GetComponent<KillableEvent>();
-                if (killableEvent != null)
-                {
-                    killableEvent.KillableDead += OnKillableDead;
-                }
+                SpawnEnemy();
 
                 _timeSinceLastSpawn = 0f;
                 _enemiesSpawnedTotalCount += 1;
@@ -66,11 +57,56 @@ namespace iDoctorTestTask
 
         #region Private Methods
 
-        private void OnGameStarted()
+        private void SpawnEnemy()
         {
-            _needToSpawn = true;
+            var spawnPlace = GetSpawnCoords();
+            Debug.Log($"{spawnPlace}");
+            var enemySpawned = Instantiate(_enemyPrefabs[Random.Range(0, _enemyPrefabs.Count)], spawnPlace,
+                Quaternion.identity);
+            enemySpawned.transform.parent = _spawnParent;
+            _enemiesSpawned.Add(enemySpawned);
+            EnemySpawned?.Invoke(enemySpawned);
+            var killableEvent = enemySpawned.GetComponent<KillableEvent>();
+            if (killableEvent != null)
+            {
+                killableEvent.KillableDead += OnKillableDead;
+            }
         }
         
+        private void OnGameStateChanged(GameState gameState)
+        {
+            _needToSpawn = gameState == GameState.Running;
+            
+            switch (gameState)
+            {
+                case GameState.Pregame:
+                    ClearSpawnedEnemies();
+                    break;
+                case GameState.Running:
+                    ClearSpawnedEnemies();
+                    _timeSinceLastSpawn = 0f;
+                    _enemiesSpawnedTotalCount = 0;
+                    break;
+                case GameState.Won:
+                    break;
+                case GameState.Lost:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(gameState), gameState, null);
+            }
+        }
+
+        private void ClearSpawnedEnemies()
+        {
+            foreach (var go in _enemiesSpawned)
+            {
+                Destroy(go);
+            }
+            Debug.Log($"1 ClearSpawnedEnemies {_enemiesSpawned.Count}");
+            _enemiesSpawned.Clear();
+            Debug.Log($"2 ClearSpawnedEnemies {_enemiesSpawned.Count}");
+        }
+
         private Vector3 GetSpawnCoords()
         {
             var angle = Random.Range(0f, 360f);
@@ -83,6 +119,10 @@ namespace iDoctorTestTask
         private void OnKillableDead(KillableEvent obj)
         {
             _enemiesSpawned.Remove(obj.gameObject);
+            if (_enemiesSpawnedTotalCount == _maxEnemies && _enemiesSpawned.Count == 0)
+            {
+                AllEnemiesKilled?.Invoke();
+            }
         }
         
         #endregion
