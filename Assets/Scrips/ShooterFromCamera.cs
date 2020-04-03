@@ -44,7 +44,7 @@ namespace iDoctorTestTask
             }
             else
             {
-                _shootingTimer += Time.unscaledDeltaTime;
+                _shootingTimer += Time.deltaTime;
             }
         }
         #endregion

@@ -19,6 +19,7 @@ public class ScoreManager : Singleton<ScoreManager>
         _scoreText = GetComponent<Text>();
         UpdateScoreText();
         GameManager.GameStarted += OnGameStarted;
+        SpawnManager.EnemySpawned += OnEnemySpawned;
     }
     
     #endregion
@@ -43,6 +44,18 @@ public class ScoreManager : Singleton<ScoreManager>
     {
         _score = 0;
         UpdateScoreText();
+    }
+
+    private void OnEnemySpawned(GameObject e)
+    {
+        if (e.GetComponent<KillableEvent>() != null)
+        {
+            SubscribeToKillable(e.GetComponent<KillableEvent>());
+        }
+        else
+        {
+            Debug.LogError($"No killableEvent on {e.name}");
+        }
     }
     
     private void UpdateScoreText()
