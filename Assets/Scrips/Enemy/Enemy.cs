@@ -11,11 +11,18 @@ namespace iDoctorTestTask
         [SerializeField] private AttackSO _attack;
         private GameObject _player;
         private ActorStats _actorStats;
+        private bool _moveToPlayer = true;
 
         private void Awake()
         {
             _player = FindObjectOfType<ShooterFromCamera>().gameObject;
             _actorStats = GetComponent<ActorStats>();
+            GameManager.GameStateChanged += OnGameStateChanged;
+        }
+
+        private void OnDestroy()
+        {
+            GameManager.GameStateChanged -= OnGameStateChanged;
         }
 
         private void Update()
@@ -27,7 +34,6 @@ namespace iDoctorTestTask
 
         private void AttackPlayer()
         {
-            Debug.Log($"{name} {Vector3.SqrMagnitude(transform.position - _player.transform.position)}");
             if (Vector3.SqrMagnitude(transform.position - _player.transform.position) < _attackDistSquared)
             {
                 var attack = _attack.CreateAttack(_actorStats);
@@ -41,8 +47,11 @@ namespace iDoctorTestTask
 
         private void MoveToPlayer()
         {
-            transform.position = Vector3.Slerp(transform.position, _player.transform.position,
-                Time.deltaTime * _speedMove);
+            if (_moveToPlayer)
+            {
+                transform.position = Vector3.Slerp(transform.position, _player.transform.position,
+                    Time.deltaTime * _speedMove);
+            }
         }
 
         private void LookAtPlayer()
@@ -50,6 +59,11 @@ namespace iDoctorTestTask
             var direction = _player.transform.position - transform.position;
             var rotation = Quaternion.LookRotation(direction, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * _speedRotation);
+        }
+        
+        private void OnGameStateChanged(GameState gameState)
+        {
+            _moveToPlayer = gameState == GameState.Running;
         }
     }
 }

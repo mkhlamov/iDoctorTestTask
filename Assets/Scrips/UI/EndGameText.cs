@@ -14,6 +14,7 @@ namespace iDoctorTestTask
         private void OnEnable()
         {
             GameManager.GameStateChanged += OnGameStateChanged;
+            DisableTexts();
         }
 
         private void OnDisable()

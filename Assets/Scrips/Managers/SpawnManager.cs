@@ -18,7 +18,7 @@ namespace iDoctorTestTask
         [SerializeField] private List<GameObject> _enemyPrefabs;
         [SerializeField] private Transform _spawnParent;
         private float _timeSinceLastSpawn = 0f;
-        [SerializeField] private List<GameObject> _enemiesSpawned = new List<GameObject>();
+        private List<GameObject> _enemiesSpawned = new List<GameObject>();
         private int _enemiesSpawnedTotalCount = 0;
         private bool _needToSpawn = false;
         
@@ -102,9 +102,7 @@ namespace iDoctorTestTask
             {
                 Destroy(go);
             }
-            Debug.Log($"1 ClearSpawnedEnemies {_enemiesSpawned.Count}");
             _enemiesSpawned.Clear();
-            Debug.Log($"2 ClearSpawnedEnemies {_enemiesSpawned.Count}");
         }
 
         private Vector3 GetSpawnCoords()

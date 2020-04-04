@@ -47,6 +47,13 @@ namespace iDoctorTestTask
         {
             return _actorStatsSO._currentHealth <= 0;
         }
+
+        public void ResetStats()
+        {
+            _actorStatsSO._damage = _actorStatsSOdefault._damage;
+            _actorStatsSO._currentHealth = _actorStatsSOdefault._currentHealth;
+            _actorStatsSO._maxHealth = _actorStatsSOdefault._maxHealth;
+        }
         #endregion
 
         private void LogStats()

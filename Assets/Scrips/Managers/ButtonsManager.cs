@@ -6,21 +6,19 @@ using UnityEngine;
 
 public class ButtonsManager : Singleton<ButtonsManager>
 {
-    protected override void Start()
+    private void OnEnable()
     {
-        base.Start();
         GameManager.GameStateChanged += OnGameStateChanged;
     }
 
-    protected override void OnDestroy()
+    private void OnDisable()
     {
-        base.OnDestroy();
         GameManager.GameStateChanged -= OnGameStateChanged;
     }
 
     private void OnGameStateChanged(GameState gameState)
     {
-        ShowButtons(gameState != GameState.Running);
+        ShowButtons(gameState == GameState.Won || gameState == GameState.Lost);
     }
 
     private void ShowButtons(bool isOn)

@@ -20,15 +20,20 @@ namespace iDoctorTestTask
         
         [SerializeField] private AttackSO _attack;
         private ActorStats _stats;
+        private bool _canShoot =  false;
 
         #region Monobehaviour
         private void Awake()
         {
             _stats = GetComponent<ActorStats>();
+            _canShoot = false;
+            GameManager.GameStateChanged += OnGameStateChanged;
         }
 
         private void Update()
         {
+            if (!_canShoot){return;}
+            
             if (_shootingTimer >= _shootingRate)
             {
                 // Shoot on tap or click
@@ -68,6 +73,11 @@ namespace iDoctorTestTask
                     }
                 }
             }
+        }
+        
+        private void OnGameStateChanged(GameState gameState)
+        {
+            _canShoot = gameState == GameState.Running;
         }
 
         #endregion
