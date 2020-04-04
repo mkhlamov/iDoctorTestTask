@@ -55,13 +55,5 @@ namespace iDoctorTestTask
             _actorStatsSO._maxHealth = _actorStatsSOdefault._maxHealth;
         }
         #endregion
-
-        private void LogStats()
-        {
-            Debug.LogFormat("Actor {0} stats:", name);
-            Debug.Log("maxHealth = " + _actorStatsSO._maxHealth);
-            Debug.Log("currentHealth = " + _actorStatsSO._currentHealth);
-            Debug.Log("damage = " + _actorStatsSO._damage);
-        }
     }
 }

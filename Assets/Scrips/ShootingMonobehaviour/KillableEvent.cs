@@ -9,7 +9,6 @@ namespace iDoctorTestTask
 
         public void OnDeath(GameObject killer)
         {
-            Debug.Log($"Event dead {this} {name}");
             KillableDead?.Invoke(this);
         }
     }
