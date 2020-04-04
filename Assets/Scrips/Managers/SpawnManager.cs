@@ -21,6 +21,7 @@ namespace iDoctorTestTask
         private List<GameObject> _enemiesSpawned = new List<GameObject>();
         private int _enemiesSpawnedTotalCount = 0;
         private bool _needToSpawn = false;
+        private GameObject _player;
         
         #region Monobehaviour Methods
         
@@ -28,6 +29,7 @@ namespace iDoctorTestTask
         {
             base.Awake();
             _needToSpawn = false;
+            _player = FindObjectOfType<ShooterFromCamera>().gameObject;
             GameManager.GameStateChanged += OnGameStateChanged;
         }
 
@@ -55,12 +57,21 @@ namespace iDoctorTestTask
 
         #endregion
 
+        #region Public Methods
+
+        public Vector3 GetNearestEnemyPosition()
+        {
+            var nearestEnemy = GetNearestEnemy();
+            return nearestEnemy == null ? _player.transform.position : nearestEnemy.transform.position;
+        }
+
+        #endregion
+        
         #region Private Methods
 
         private void SpawnEnemy()
         {
             var spawnPlace = GetSpawnCoords();
-            Debug.Log($"{spawnPlace}");
             var enemySpawned = Instantiate(_enemyPrefabs[Random.Range(0, _enemyPrefabs.Count)], spawnPlace,
                 Quaternion.identity);
             enemySpawned.transform.parent = _spawnParent;
@@ -121,6 +132,23 @@ namespace iDoctorTestTask
             {
                 AllEnemiesKilled?.Invoke();
             }
+        }
+        
+        private GameObject GetNearestEnemy()
+        {
+            var minDist = Mathf.Infinity;
+            GameObject nearest = _player;
+            foreach (var e in _enemiesSpawned)
+            {
+                var dist = Vector3.SqrMagnitude(e.transform.position - _player.transform.position);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    nearest = e;
+                }
+            }
+
+            return nearest == _player ? null : nearest;
         }
         
         #endregion

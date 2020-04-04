@@ -832,6 +832,7 @@ GameObject:
   - component: {fileID: 1096932775}
   - component: {fileID: 1096932776}
   - component: {fileID: 1096932777}
+  - component: {fileID: 1096932778}
   m_Layer: 0
   m_Name: AR Camera
   m_TagString: Untagged
@@ -1029,7 +1030,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 500
+  MaxDistance: 164.54245
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -1104,6 +1105,14 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!81 &1096932778
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096932766}
+  m_Enabled: 1
 --- !u!1 &1145215176 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8332676643382444517, guid: deac4828c5fb0f041a3f13acdd826db5,

@@ -35,7 +35,7 @@ namespace iDoctorTestTask
 
         protected virtual void Start()
         {
-            Debug.Log("Singleton " + name);
+            //Debug.Log("Singleton " + name);
         }
 
         protected virtual void OnDestroy()
