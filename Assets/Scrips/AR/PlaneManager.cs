@@ -48,6 +48,7 @@ namespace iDoctorTestTask
                 _FirstPlaneFound = true;
                 _MoveWithScreen = true;
                 _previewObject = Instantiate(_previewPrefab);
+                planeFound?.Invoke();
             }
         }
 
