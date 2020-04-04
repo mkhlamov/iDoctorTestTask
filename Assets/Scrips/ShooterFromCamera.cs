@@ -21,11 +21,13 @@ namespace iDoctorTestTask
         [SerializeField] private AttackSO _attack;
         private ActorStats _stats;
         private bool _canShoot =  false;
+        private AudioSource _gunShot;
 
         #region Monobehaviour
         private void Awake()
         {
             _stats = GetComponent<ActorStats>();
+            _gunShot = GetComponent<AudioSource>();
             _canShoot = false;
             GameManager.GameStateChanged += OnGameStateChanged;
         }
@@ -73,11 +75,20 @@ namespace iDoctorTestTask
                     }
                 }
             }
+            PlayFireSound();
         }
         
         private void OnGameStateChanged(GameState gameState)
         {
             _canShoot = gameState == GameState.Running;
+        }
+        
+        private void PlayFireSound()
+        {
+            if (_gunShot != null)
+            {
+                _gunShot.Play();
+            }
         }
 
         #endregion
